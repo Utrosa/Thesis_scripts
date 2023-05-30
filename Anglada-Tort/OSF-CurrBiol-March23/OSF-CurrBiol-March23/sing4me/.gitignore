@@ -1,0 +1,9 @@
+env
+__pycache__/
+.ipynb_checkpoints
+.DS_Store
+*.egg-info/
+.idea
+.pytest_cache
+.benchmarks
+output_benchmark.json

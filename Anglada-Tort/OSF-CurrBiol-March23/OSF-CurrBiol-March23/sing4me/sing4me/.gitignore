@@ -1,0 +1,10 @@
+venv
+env
+__pycache__/*
+.vscode/*
+singing_extract.egg-info/*
+.DS_Store
+singing_extract/__pycache__/*
+demos/.ipynb_checkpoints
+output/plots/*
+output/old/*
