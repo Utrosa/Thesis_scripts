@@ -1,0 +1,4 @@
+1. Check that the Excel spreadsheet has a value of 1.0 for all empty cells in the Reliabilities column. Also, sort the spreadsheet by age category (infant, toddler, preschool, school, teen, young_adult, adult). Then download the updated Excel spreadsheet with data from OneDrive.
+2. Make a copy of the Excel sheet 'data'. Save it as a Tab Delimited file. change the file extension to "tsv".
+3. Run Python notebook: Power
+4. Run R code: funnel-forest
