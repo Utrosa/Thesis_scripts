@@ -1,12 +1,14 @@
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
+%                                                                        %
+%             Brain Parcellation: FSLmeants for single ROI               %
+%                                                                        %
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
 function functional_parcellation_FSL(subjectdir, atlas_filename, ...
                                      filename, atlas)
 % Extract the name of the subject that will be printed with every update.
-k           = strfind(subjectdir,'subject');
-sub         = [subjectdir(k:end),' - ']; 
+k           = strfind(subjectdir,'sub');
+sub         = [subjectdir(k:k+5),' - ']; 
 clear k
-
-% Ensure smooth output printing
-warning('off','all');
 
 % Specify the prerequisites 
 cd(subjectdir);
@@ -25,15 +27,15 @@ fprintf([time, ' ', sub, scan ': ', ...
 filename1 = [filename, '.nii.gz'];
 
 % Resample mask matrix size to match input image size ---------------------
-cmd_resample = ['flirt -in ' filename1 ...
-                ' -out resampled_f0.nii.gz ' ...
-                ' -ref ' atlas_filename ' -applyxfm '];
-system(cmd_resample);
+% cmd_resample = ['flirt -in ' filename1 ...
+%                 ' -out resampled_f0.nii.gz ' ...
+%                 ' -ref ' atlas_filename ' -applyxfm '];
+% system(cmd_resample);
 
 % Compute the mean using only non_zero voxels -----------------------------
-cmd_nzmean = ['fslmeants -i resampled_f0.nii.gz ' ...
+cmd_nzmean = ['fslmeants' ' -i ' filename ...
               ' -o ' filename '_seed_' atlas '.txt' ...
-              ' -m ', atlas_filename];
+              ' -m ' atlas_filename];
 system(cmd_nzmean);
 
 % Z-scoring
@@ -42,17 +44,19 @@ ts_zscore  = zscore(ts_parcel,[],2);
 
 % Compute the number of non_zero voxels: atlas ----------------------------
 % Capital V outputs voxel volume for non-zero voxels only.
-cmd_nzvoxel_atlas = ['fslstats -i ' atlas ...
-                     ' -o ' atlas_filename '_atlas ' atlas '.txt' ...
-                     ' -k ' atlas_filename ' -V '];
+cmd_nzvoxel_atlas = ['fslstats ' atlas_filename ...
+                     ' -k ' atlas_filename ' -V ' ...
+                     '> ' atlas '_voxelNum.txt'];
+
 system(cmd_nzvoxel_atlas);
 voxel_per_roi1    = readmatrix([atlas '_voxelNum.txt']);
 
 % Compute the number of non_zero voxels: filename -------------------------
 % Capital V outputs voxel volume for non-zero voxels only.
-cmd_nzvoxel_data  = ['fslstats -i ' filename1 ...
-                     ' -o ' atlas_filename '_atlas ' atlas '.txt' ...
-                     ' -k ' atlas_filename ' -V '];
+cmd_nzvoxel_data  = ['fslstats ' filename1 ...
+                     ' -k ' atlas_filename ' -V ' ... 
+                     ' > ' filename '_voxelNum_' atlas '.txt'];
+
 system(cmd_nzvoxel_data);
 voxel_per_roi2    = readmatrix([filename '_voxelNum_' atlas '.txt']);
 voxel_per_roi     = [voxel_per_roi1, voxel_per_roi2];

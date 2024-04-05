@@ -1,107 +1,73 @@
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
-%                                                                         %
-%      Filtering, Signal Regression, Brain Parcellation, Z-scoring        %
-%                                                                         %
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
-clear; close all; clc
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
+%                                                                        %
+%                Temporal Filtering and Signal Regression                %
+%         (global, white matter and cerebrospinal fluid signals)         %
+%                                                                        %
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
+function filename=filtering_signalreg(subjectdir, filename, TR, fil, ...
+                  gsr, wmcsfr, WM_probseg, CSF_probseg)
 
-% Setup -------------------------------------------------------------------
-addpath('C:\Program Files\MATLAB\R2022b');
-addpath('C:\Users\monik\NIfTI_20140122');
-
-dirhead     = pwd;
-dirdata     = dir([dirhead '/test-data']);
-%n_subj_st   = find(strcmp({dirdata.name}, 'subject008')==1);
-
-subjectdir     = [dirhead '/test-data/subject008/'];
-diratlas       = [dirhead '/preprocessing_Xu_Smith_2023/resources'];
-atlas          = 'fan246'; %Brainnetome atlas 2016 with 246 parcels
-atlas_filename = [diratlas '/Fan2016parcel_Yeo/BN_Atlas_246_2mm.nii.gz']; 
-
-% Input the smoothed fMRIPrep preprocessed data
-filename = 'f01_smoothed';
-
-% Set the parameters: TR (depends on ABIDE collection), fill (filtering 
-% bandwidth), gsr (global signal regression; 1 = yes and 0 = no), wmcsfr 
-% (white matter and cerebrospinal fluid regression; 1 = yes and 0 = no).
-TR = 2;
-fil = [0.01, 0.08];
-gsr = 1;
-wmcsfr = 1;
-
-% Which subject?
-k = strfind(subjectdir,'subject');
-sub = [subjectdir(k:end),' - ']; 
-clear k
+k = strfind(subjectdir,'sub');  
+sub = [subjectdir(k:k+5),' - ']; clear k
+% This is simply helping with the text that will be displayed as the
+% function is running. 'sub' is a string with the name of the subject that
+% will be printed with every update (see Anzar Abbas, 2016).
 
 warning('off','all');
+cd(subjectdir);
 
-% Temporal Filtering of Functional Data -----------------------------------
+%% ------------------------- Temporal Filtering ------------------------ %%
+
 time = whatsthetime();
 fprintf([time,' ',sub,'Temporal filtering ... '])
-
 % Load data
 cd (subjectdir)
 nii = load_untouch_nii([filename,'.nii.gz']);
 f = nii.img;
 [X,Y,Z,T] = size(f);
-
 % Getting the dimensions of the functional scan
 f = reshape(f,[X*Y*Z,T]); 
 f = f';
-
 % Reshaping the scan into a 2D matrix of time over voxels
 tc = f;
-
 % Renaming the functional timeseries as tc
 SF = 1/TR';
-
 % Calculating the sampling frequency using the TR
 x = size(tc,1);
-
 % x is the number of timepoints
 tc_mirror = tc(end:-1:1,:);
-
 % This the mirror of the timeseries
 tc_extended = [tc_mirror; tc; tc_mirror];
-
 % Extend the timecourse in a periodical way
 tc_fft = fft(tc_extended);
-
 % Getting the fast fourier transform
 if fil(1) > 0
     high_cutoff = round(size(tc_extended,1)*fil(1)/SF);
     tc_fft(1:high_cutoff,:) = 0;
 end
-
 % Conducting the high pass filtering
 if fil(2) > 0
     low_cutoff = round(size(tc_extended,1)*fil(2)/SF);
     tc_fft(low_cutoff:end,:) = 0;
 end
-
 % Conducting the low pass filtering
 tc_filtered = ifft(tc_fft);
-
 % Inverse fast fourier transform
 temp = 2*real(tc_filtered);
 tc_filtered = temp(x+1:2*x,:);
-
 % Getting the final filtered functional scan
 f = tc_filtered';
 f = reshape(f,[X,Y,Z,T]);
 nii.img = f;
 save_untouch_nii(nii,[filename,'_fil.nii.gz']);
-
 % Just to cut down on file size, I'm multiplying the functional
 % scan by the brain mask again
 filename = [filename,'_fil'];
-fprintf('Done\n')
+fprintf('completed successfully.\n')
 clear f1 tc_filtered temp tc_fft low_cutoff high_cutoff
 clear tc_extended tc_mirror x
 
-% Global signal regression ------------------------------------------------
-%
+%% ---------------------- Global Signal Regression --------------------- %%
 time = whatsthetime();
 fprintf([time,' ', sub, 'Global signal regression ... '])
 if gsr == 1
@@ -140,12 +106,13 @@ if gsr == 1
     nii.img = f;
     save_untouch_nii(nii,[filename,'.nii.gz']);
     % Saving the global signal regressed functional scan
-    fprintf('Done\n')
+    fprintf('completed successfully.\n')
 else
     fprintf('Skipped\n')
 end
 
-% White Matter and CSF signal regression ----------------------------------
+%% --------------- White Matter and CSF Signal Regression -------------- %%
+
 time = whatsthetime();
 fprintf([time, ' ', sub, 'WM/CSF signal regression ... '])
 if wmcsfr == 1
@@ -154,11 +121,11 @@ if wmcsfr == 1
         f = nii.img;
         % Loading the functional scan
     end
-    wm_mask = load_nii('sub-08_space-MNI152NLin2009cAsym_res-2_label-WM_probseg.nii.gz');
+    wm_mask = load_nii(WM_probseg);
     wm_mask = wm_mask.img;
     % Loading white matter mask
     csf_mask = ...
-        load_nii('sub-08_space-MNI152NLin2009cAsym_res-2_label-CSF_probseg.nii.gz');
+        load_nii(CSF_probseg);
     csf_mask = csf_mask.img;
     % Loading the CSF mask
     wmcsf_mask = double(logical(wm_mask + csf_mask));
@@ -205,61 +172,7 @@ if wmcsfr == 1
     save_untouch_nii(nii,[filename,'_wmcsfr.nii.gz']);
     % Saving the white matter/CSF regressef functiona scan
     filename = [filename,'_wmcsfr'];
-    fprintf('Done\n')
+    fprintf('completed successfully.\n')
 else
     fprintf('Skipped\n')
 end
-
-% Brain Parcellation ------------------------------------------------------
-if gsr==1
-    ext='gsr';
-    filename1=[filename '_' ext];
-    functional_parcellation_zscore(subjectdir, atlas_filename, filename1, atlas);
-end
-
-if wmcsfr==1
-    ext='wmcsfr';
-    filename1=[filename '_' ext];
-    functional_parcellation_zscore(subjectdir, atlas_filename, filename1, atlas)
-end
-% Z-scoring all voxels in functional scan ______________________________ %
-%
-time = whatsthetime();
-fprintf([time,' ', sub, 'Z-scoring ... '])
-if gsr ~= 1
-    nii = load_untouch_nii([filename,'.nii.gz']);
-    f = nii.img;
-    % Loading the functional scan in case it wasn't already
-    % loaded in the previous step
-end
-mask = load_nii([atlasdir,'/atlas_t1_brain_mask.nii.gz']);
-mask = mask.img;
-% Loading the T1 mask
-[x,y,z,~] = size(f);
-% Assigning variables to the dimensions of the scan
-for j = 1:x
-    for k = 1:y
-        for l = 1:z
-            if mask(j,k,l) == 1
-                voxel = f(j,k,l,:);
-                % Working on one brain voxel at a time
-                voxel_zsc = zscore(voxel);
-                % Z-scoring the voxel signal
-                f(j,k,l,:) = voxel_zsc;
-                % Adding the zscored value to the zscored
-                % functional scan matrix
-            end
-        end
-    end
-end
-nii.img = f;
-save_untouch_nii(nii,[filename,'_zsc.nii.gz']);
-filename = [filename,'_zsc'];
-clear nii x y z j k l
-fprintf('Done\n')
-% Saving the newly z-scored functional scan
-% ___________________________________________________________ %
-
-time = whatsthetime();
-fprintf([time,' ', sub,'Finished the final preprocessing steps\n'])
-warning('on','all');
