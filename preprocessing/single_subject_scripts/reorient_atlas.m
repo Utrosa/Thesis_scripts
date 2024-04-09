@@ -3,13 +3,12 @@
 %                          Reorienting the Atlas                         %
 %                                                                        %
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
-function reorient_atlas(subjectdir, diratlas, atlas_filename, atlas)
+function reorient_atlas(diratlas, atlas_filename, atlas)
 
+% Define the name of the reoriented atlas (output).
 output_name = [diratlas 'reorient_' atlas '.nii.gz'];
-k           = strfind(subjectdir,'sub');
-sub         = [subjectdir(k:k+5),' - ']; clear k;
 time        = whatsthetime();
-fprintf([time, ' ', sub, 'Reorienting the atlas ... ']);
+fprintf([time, ' Reorienting the atlas ... ']);
 
 % Reorient along x dimension to standard: Left-to-Right
 cmd = ['3dresample -orient LPI ' '-prefix ' output_name ...

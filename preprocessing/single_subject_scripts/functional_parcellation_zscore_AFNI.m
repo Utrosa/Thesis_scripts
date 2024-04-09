@@ -47,5 +47,4 @@ voxel_per_roi     = [voxel_per_roi1, voxel_per_roi2];
 % Save the output ---------------------------------------------------------
 save([filename '_on_parcel_' atlas '.mat'],'ts_parcel', ...
      'ts_zscore','voxel_per_roi');
-
 fprintf('completed successfully.\n')

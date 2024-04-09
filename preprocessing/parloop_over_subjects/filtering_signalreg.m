@@ -4,25 +4,21 @@
 %         (global, white matter and cerebrospinal fluid signals)         %
 %                                                                        %
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ %
-function filename=filtering_signalreg(subjectdir, filename, TR, fil, ...
-                  gsr, wmcsfr, WM_probseg, CSF_probseg)
+% See the Anzar Abbas' preprocessing pipeline from 2016 for more info.
+function filtering_signalreg(subjectdir, TR, fil, gsr, wmcsfr, ...
+                             WM_probseg, CSF_probseg)
+% Set the input file
+input_FIL  = [subjectdir, '_smoothed.nii.gz'];
 
+% Get information about subject and current time
 k = strfind(subjectdir,'sub');  
-sub = [subjectdir(k:k+5),' - ']; clear k
-% This is simply helping with the text that will be displayed as the
-% function is running. 'sub' is a string with the name of the subject that
-% will be printed with every update (see Anzar Abbas, 2016).
-
-warning('off','all');
-cd(subjectdir);
-
-%% ------------------------- Temporal Filtering ------------------------ %%
-
+sub = [subjectdir(k:k+5),' - ']; clear k;
 time = whatsthetime();
+warning('off','all');
+%% ------------------------- Temporal Filtering ------------------------ %%
 fprintf([time,' ',sub,'Temporal filtering ... '])
 % Load data
-cd (subjectdir)
-nii = load_untouch_nii([filename,'.nii.gz']);
+nii = load_untouch_nii(input_FIL);
 f = nii.img;
 [X,Y,Z,T] = size(f);
 % Getting the dimensions of the functional scan
@@ -59,19 +55,19 @@ tc_filtered = temp(x+1:2*x,:);
 f = tc_filtered';
 f = reshape(f,[X,Y,Z,T]);
 nii.img = f;
-save_untouch_nii(nii,[filename,'_fil.nii.gz']);
+save_untouch_nii(nii,[subjectdir,'_fil.nii.gz']);
 % Just to cut down on file size, I'm multiplying the functional
 % scan by the brain mask again
-filename = [filename,'_fil'];
 fprintf('completed successfully.\n')
 clear f1 tc_filtered temp tc_fft low_cutoff high_cutoff
 clear tc_extended tc_mirror x
 
 %% ---------------------- Global Signal Regression --------------------- %%
+input_GSR  = [subjectdir, '_fil.nii.gz'];
 time = whatsthetime();
 fprintf([time,' ', sub, 'Global signal regression ... '])
 if gsr == 1
-    nii = load_untouch_nii([filename,'.nii.gz']);
+    nii = load_untouch_nii(input_GSR);
     f = nii.img;
     % Loading the functional scan into Matlab
     f_gsr = f;
@@ -102,9 +98,8 @@ if gsr == 1
     % Regressing the global signal from the functional
     % timeseries
     f = f_gsr; 
-    filename = [filename,'_gsr'];
     nii.img = f;
-    save_untouch_nii(nii,[filename,'.nii.gz']);
+    save_untouch_nii(nii,[subjectdir,'_gsr_fil.nii.gz']);
     % Saving the global signal regressed functional scan
     fprintf('completed successfully.\n')
 else
@@ -112,20 +107,20 @@ else
 end
 
 %% --------------- White Matter and CSF Signal Regression -------------- %%
-
+input_WMCSF  = [subjectdir, '_gsr_fil.nii.gz'];
 time = whatsthetime();
 fprintf([time, ' ', sub, 'WM/CSF signal regression ... '])
 if wmcsfr == 1
     if gsr == 0
-        nii = load_untouch_nii([filename,'.nii.gz']);
+        nii = load_untouch_nii(input_WMCSF);
         f = nii.img;
         % Loading the functional scan
     end
-    wm_mask = load_nii(WM_probseg);
+    wm_mask = load_nii([subjectdir, '/anat/', WM_probseg]);
     wm_mask = wm_mask.img;
     % Loading white matter mask
     csf_mask = ...
-        load_nii(CSF_probseg);
+        load_nii([subjectdir, '/anat/', CSF_probseg]);
     csf_mask = csf_mask.img;
     % Loading the CSF mask
     wmcsf_mask = double(logical(wm_mask + csf_mask));
@@ -169,9 +164,8 @@ if wmcsfr == 1
     % functional timeseries 
     f = f_wmcsf_r;
     nii.img = f;
-    save_untouch_nii(nii,[filename,'_wmcsfr.nii.gz']);
-    % Saving the white matter/CSF regressef functiona scan
-    filename = [filename,'_wmcsfr'];
+    save_untouch_nii(nii,[subjectdir,'_wmcsfr_gsr_fil.nii.gz']);
+    % Saving the white matter/CSF regressef functional scan
     fprintf('completed successfully.\n')
 else
     fprintf('Skipped\n')
