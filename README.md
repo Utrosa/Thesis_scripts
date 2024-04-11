@@ -1,7 +1,7 @@
 # Dynamic Functional Connectivity (FC) in Autism Spectrum Disorder (ASD)
 This repository contains code related to my master's thesis project. In short, the project entails power calculation, preprocessing resting-state fMRI data code, static FC analysis, and dynamic FC analysis.
 
-## fMRIPrep preprocessing
+## fMRIPrep Preprocessing
 
 A note on the arguments of fMRIPrep: we are analyzing data from children aged 8 -14. Since an unresolved bug prevents us from registering the data to a pediatric brain template, we registered the data to the MNI152NLin6Asym atlas. The good side of using this template is that for resolution 2mm (2x2x2 voxels), the shape of the atlas matches the shape of the atlas used for brain parcellation (91x106x91). This means that no resampling has to be performed. The Human brainnetome atlas only need to be re-oriented from Left-Right to Right-Left.
 
