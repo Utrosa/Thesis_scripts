@@ -138,6 +138,3 @@ png("funnel_RE_pheno_mean.png", width = 1500, height = 1500, res = 300)
 funnel(RE_pheno_mean)
 dev.off()
 ###############################################################################
-
-
-

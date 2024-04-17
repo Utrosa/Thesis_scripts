@@ -1,7 +1,7 @@
 # How to download ABIDE data in BIDS format?
 
 ## Create an AWS account
-[Click here to read the setup guide.](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)
+[Click here to read the setup guide](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)
 
 ## Connect to AWS access portal
 Before running AWS S3 bucket commands in the terminal, connect to your AWS access portal as an IAM user (not a root user). Open the AWS configuration file, stored locally on your machine. This file contains the sso_start_url, which you can copy & paste to a browser to connect to your AWS account.
