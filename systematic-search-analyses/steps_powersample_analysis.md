@@ -7,7 +7,7 @@
 	- mean age of the sample,
 	- type of effect size measure (e.g.: Cohen's d, correlation coefficient, ...), 
 	- effect size estimate, and
-	- significance level (`&alpha;`).
+	- significance level (`α`).
 2. Check that the spreadsheet has a default value of `1.0` for all empty cells in the `reliability` column.
 3. Sort the spreadsheet by age category: infant, toddler, preschool children, school children, teen, young adult, adult. 
 4. Save the file as: `Meta-Analysis-Static-FC.xlsx`.
