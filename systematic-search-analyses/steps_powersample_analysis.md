@@ -1,4 +1,4 @@
-# Power and meta-analysis steps
+# Power and Meta-Analysis Steps
 
 ## Prepare the data
 1. Create an Excel spreadsheet that systemizes information about all records selected in the systematic literature search. This information should include at least:
