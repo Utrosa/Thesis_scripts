@@ -1,9 +1,6 @@
 
-Results included in this manuscript come from preprocessing
-performed using *fMRIPrep* 23.2.1
-(@fmriprep1; @fmriprep2; RRID:SCR_016216),
-which is based on *Nipype* 1.8.6
-(@nipype1; @nipype2; RRID:SCR_002502).
+Results included in this manuscript come from preprocessing performed using *fMRIPrep* 23.2.1
+(@fmriprep1; @fmriprep2; RRID:SCR_016216), which is based on *Nipype* 1.8.6 (@nipype1; @nipype2; RRID:SCR_002502).
 
 
 Anatomical data preprocessing
