@@ -3,7 +3,7 @@ This repository contains code related to my master's thesis project. In short, t
 
 ## fMRIPrep Preprocessing
 
-A note on the arguments of fMRIPrep: we are analyzing data from children aged 8 -14. Since an unresolved bug prevents us from registering the data to a pediatric brain template, we registered the data to the MNI152NLin6Asym atlas. The good side of using this template is that for resolution 2mm (2x2x2 voxels), the shape of the atlas matches the shape of the atlas used for brain parcellation (91x106x91). This means that no resampling has to be performed. The Human brainnetome atlas only need to be re-oriented from Left-Right to Right-Left.
+A note on the arguments of fMRIPrep: we are analyzing data from children aged 8-14. Since an unresolved bug prevents us from registering the data to a pediatric brain template, we registered the data to the MNI152NLin6Asym atlas. The good side of using this template is that for resolution 2mm (2x2x2 voxels), the shape of the atlas matches the shape of the atlas used for brain parcellation (91x106x91). This means that no resampling has to be performed. The Human brainnetome atlas only needs to be re-oriented from Left-Right to Right-Left.
 
 Run the fMRIPrep in bash, using fmriprep-docker, on all subjects. fmriprep-docker is a wrapper that translates fMRIPrep commands to docker commands so that no mounting has to be done manually. Since we have access to a high-performance computer, we can run the pipeline over all subjects in parallel. This speeds up the preprocessing.
 
