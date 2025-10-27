@@ -1,5 +1,5 @@
-# Dynamic Functional Connectivity in Autism Spectrum Disorder
-This repository contains code related to my master's thesis project. In short, the project entails power calculation, preprocessing resting-state fMRI data code, static FC analysis, dynamic FC (QPP) analysis, and brain-behavior association analysis.
+# Spatiotemporal Structure of Spontaneous Brain Activity in Autistic Children
+This repository contains code related to my master's thesis project which entails power calculation, preprocessing resting-state fMRI data, static FC analysis, quasi-periodic pattern (QPP) analysis, and brain-behavior association analysis.
 
 ## fMRIPrep Preprocessing
 
