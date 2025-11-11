@@ -1,14 +1,12 @@
 # Spatiotemporal Structure of Spontaneous Brain Activity in Autistic Children
-This repository contains code related to my master's thesis project which entails power calculation, preprocessing resting-state fMRI data, static FC analysis, quasi-periodic pattern (QPP) analysis, and brain-behavior association analysis.
+This repository contains scripts for power calculation, preprocessing resting-state fMRI data, static functional connectivity (FC) analysis, quasi-periodic pattern (QPP) analysis, and brain-behavior correlation analysis.
 
 ## fMRIPrep Preprocessing
 A note on the arguments of fMRIPrep: we were analyzing data from children aged 8-14. Since an unresolved bug prevented us from registering the data to a pediatric brain template, we registered the data to the MNI152NLin6Asym atlas. The good side of using this template is that for resolution 2mm (2x2x2 voxels), the shape of the atlas matches the shape of the atlas used for brain parcellation (91x106x91). This means that no resampling has to be performed. The Human Brainnetome Atlas only needs to be re-oriented from Left-Right to Right-Left.
 
 Run the fMRIPrep in bash, using fmriprep-docker, on all subjects. fmriprep-docker is a wrapper that translates fMRIPrep commands to docker commands so that no mounting has to be done manually. Since we have access to a high-performance computer, we can run the pipeline over all subjects in parallel. This speeds up the preprocessing.
 
-There are two scripts related to this. Run the parallel_fMRIPrep script in the bash terminal, to start the preprocessing. If any errors occur, they will be saved in the log (see Docker logs or logs stored per subject folder in your output directory). Note that the pipeline will stop at the first crash. No worries though - you can re-run fMRIPrep with the same parameters, and the preprocessing will continue where it stopped. The -w parameter allows for this.
-
-Sometimes fMRIPrep can hang ... so, try re-running with low memory flag.
+There are two scripts related to this. Run the parallel_fMRIPrep script in the bash terminal, to start the preprocessing. If any errors occur, they will be saved in the log (see Docker logs or logs stored per subject folder in your output directory). Note that the pipeline will stop at the first crash. No worries though - you can re-run fMRIPrep with the same parameters, and the preprocessing will continue where it stopped. The -w parameter allows for this. Sometimes fMRIPrep can hang ... so, try re-running with low memory flag.
 
 The boilerplate summarizing the preprocessing steps and parameters can be found at <OUTPUT_PATH>/logs/CITATION.md.
 
